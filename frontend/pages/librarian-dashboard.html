@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Librarian Circulation Desk | DLMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="academic-navbar">
+    <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
+      <a class="navbar-brand" href="/index.html">
+        <div class="brand-crest"><i class="bi bi-mortarboard-fill"></i></div>
+        <div class="brand-text">
+          <span class="brand-title">DIGITAL LIBRARY</span>
+          <span class="brand-sub">CIRCULATION DESK</span>
+        </div>
+      </a>
+
+      <div class="d-flex align-items-center gap-3">
+        <div class="text-end d-none d-md-block">
+          <div class="fw-bold small text-dark" id="nav-librarian-name">Circulation Officer</div>
+          <span class="badge bg-primary-subtle text-primary small">LIBRARIAN</span>
+        </div>
+        <button onclick="logout()" class="btn btn-academic-outline btn-sm"><i class="bi bi-box-arrow-right me-1"></i>Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="dashboard-wrapper">
+    <!-- Sidebar -->
+    <aside class="academic-sidebar">
+      <div class="sidebar-user-card">
+        <div class="sidebar-user-name" id="sidebar-lib-name">Librarian</div>
+        <div class="sidebar-role-badge">OFFICIAL CIRCULATION DESK</div>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li><a href="/pages/librarian-dashboard.html" class="sidebar-nav-link active"><i class="bi bi-speedometer2"></i>Dashboard</a></li>
+        <li><a href="/pages/books.html" class="sidebar-nav-link"><i class="bi bi-book"></i>Catalog Books</a></li>
+        <li><a href="#" class="sidebar-nav-link" onclick="openStepIssueModal()"><i class="bi bi-plus-circle"></i>Issue Book</a></li>
+        <li><a href="/pages/borrowing-history.html" class="sidebar-nav-link"><i class="bi bi-arrow-return-left"></i>Returns & Loans</a></li>
+        <li><a href="/pages/inventory.html" class="sidebar-nav-link"><i class="bi bi-box-seam"></i>Inventory Audit</a></li>
+        <li><a href="/pages/reservations.html" class="sidebar-nav-link"><i class="bi bi-bookmark-check"></i>Reservations</a></li>
+        <li><a href="/pages/fines.html" class="sidebar-nav-link"><i class="bi bi-cash-coin"></i>Fine Collection</a></li>
+        <li><a href="/pages/reports.html" class="sidebar-nav-link"><i class="bi bi-bar-chart-line"></i>Reports</a></li>
+        <li><a href="#" class="sidebar-nav-link" onclick="logout()"><i class="bi bi-box-arrow-left"></i>Logout</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-content">
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="font-serif fw-bold mb-1">Circulation Desk Overview</h2>
+          <p class="text-muted small mb-0">Oversee active circulation, issue new books, inspect due returns, and audit inventory</p>
+        </div>
+        <div class="d-flex gap-2 mt-2 mt-md-0">
+          <button class="btn btn-academic-gold btn-sm" onclick="openStepIssueModal()">
+            <i class="bi bi-arrow-right-circle me-1"></i>Issue Book Workflow
+          </button>
+          <a href="/pages/inventory.html" class="btn btn-academic-outline btn-sm">
+            <i class="bi bi-box-seam me-1"></i>Inventory Audit
+          </a>
+        </div>
+      </div>
+
+      <!-- 5 Stat Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl">
+          <div class="stat-card-academic">
+            <div class="stat-icon-wrapper"><i class="bi bi-book text-primary"></i></div>
+            <div class="stat-number" id="stat-total-books">0</div>
+            <div class="stat-title">Catalog Titles</div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl">
+          <div class="stat-card-academic">
+            <div class="stat-icon-wrapper"><i class="bi bi-check2-circle text-success"></i></div>
+            <div class="stat-number text-success" id="stat-available-copies">0</div>
+            <div class="stat-title">Available Copies</div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl">
+          <div class="stat-card-academic">
+            <div class="stat-icon-wrapper"><i class="bi bi-arrow-left-right text-info"></i></div>
+            <div class="stat-number" id="stat-issued-books">0</div>
+            <div class="stat-title">Issued Copies</div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl">
+          <div class="stat-card-academic">
+            <div class="stat-icon-wrapper"><i class="bi bi-alarm text-danger"></i></div>
+            <div class="stat-number text-danger" id="stat-overdue-books">0</div>
+            <div class="stat-title">Overdue Loans</div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-xl">
+          <div class="stat-card-academic">
+            <div class="stat-icon-wrapper"><i class="bi bi-cash-stack text-warning"></i></div>
+            <div class="stat-number text-warning" id="stat-outstanding-fines">$0.00</div>
+            <div class="stat-title">Unpaid Fines</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="card-academic p-3 mb-4">
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+          <span class="small fw-bold text-muted text-uppercase me-2"><i class="bi bi-lightning-charge-fill text-warning me-1"></i>Quick Actions:</span>
+          <button class="btn btn-academic-primary btn-sm" onclick="openStepIssueModal()"><i class="bi bi-plus-lg me-1"></i>Issue Book</button>
+          <button class="btn btn-academic-outline btn-sm" data-bs-toggle="modal" data-bs-target="#newBookModal"><i class="bi bi-book-plus me-1"></i>Add Book</button>
+          <a href="/pages/borrowing-history.html" class="btn btn-academic-outline btn-sm"><i class="bi bi-arrow-return-left me-1"></i>Process Returns</a>
+          <a href="/pages/inventory.html" class="btn btn-academic-outline btn-sm"><i class="bi bi-box-seam me-1"></i>Adjust Inventory</a>
+          <a href="/pages/reports.html" class="btn btn-academic-outline btn-sm"><i class="bi bi-bar-chart-line me-1"></i>Executive Reports</a>
+        </div>
+      </div>
+
+      <!-- Recent Borrowing Transactions -->
+      <div class="card-academic mb-4">
+        <div class="card-academic-header">
+          <h5 class="fw-bold font-serif"><i class="bi bi-clock-history text-primary me-2"></i>Circulation Desk Transactions</h5>
+          <a href="/pages/borrowing-history.html" class="btn btn-academic-outline btn-sm">All Records &rarr;</a>
+        </div>
+        <div class="table-responsive">
+          <table class="academic-table">
+            <thead>
+              <tr>
+                <th>TX ID</th>
+                <th>Volume Title</th>
+                <th>Scholar Name</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="recent-transactions-tbody">
+              <tr><td colspan="6" class="text-center py-4 text-muted">Loading circulation transactions...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Operational 4-Step Issue Book Workflow Modal -->
+  <div class="modal fade" id="stepIssueModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content card-academic p-3">
+        <div class="modal-header border-bottom pb-2">
+          <h5 class="modal-title font-serif fw-bold"><i class="bi bi-journal-plus text-primary me-2"></i>Book Issue Workflow</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body py-3">
+          <!-- Step 1: Member Resolution -->
+          <div class="border rounded p-3 mb-3 bg-light">
+            <h6 class="fw-bold font-serif mb-2"><i class="bi bi-1-circle-fill text-warning me-1"></i>Step 1: Search & Verify Member</h6>
+            <div class="input-group input-group-sm mb-2">
+              <input type="text" id="workflow-member-query" class="form-control" placeholder="Enter Member ID (e.g. MEM-2025-1001) or Email...">
+              <button class="btn btn-academic-primary" type="button" onclick="verifyWorkflowMember()">Verify Member</button>
+            </div>
+            <div id="workflow-member-result" class="small text-muted">Awaiting member lookup...</div>
+          </div>
+
+          <!-- Step 2: Book Resolution -->
+          <div class="border rounded p-3 mb-3 bg-light">
+            <h6 class="fw-bold font-serif mb-2"><i class="bi bi-2-circle-fill text-warning me-1"></i>Step 2: Search & Verify Book Volume</h6>
+            <div class="input-group input-group-sm mb-2">
+              <input type="text" id="workflow-book-query" class="form-control" placeholder="Enter Title or ISBN...">
+              <button class="btn btn-academic-primary" type="button" onclick="verifyWorkflowBook()">Find Volume</button>
+            </div>
+            <div id="workflow-book-result" class="small text-muted">Awaiting volume lookup...</div>
+          </div>
+
+          <!-- Step 3: Circulation Calculation -->
+          <div class="border rounded p-3 mb-3 bg-white">
+            <h6 class="fw-bold font-serif mb-2"><i class="bi bi-3-circle-fill text-warning me-1"></i>Step 3: Loan Calculation & Policy Enforcement</h6>
+            <div class="row g-2 small text-muted">
+              <div class="col-sm-6">Issue Date: <strong class="text-dark" id="workflow-issue-date">Today</strong></div>
+              <div class="col-sm-6">Projected Due Date: <strong class="text-primary" id="workflow-due-date">14 – 30 days based on plan</strong></div>
+            </div>
+          </div>
+
+          <!-- Step 4: Confirmation -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-muted">Circulation Notes (Optional)</label>
+            <input type="text" id="workflow-notes" class="form-control form-control-sm" placeholder="e.g. Checked out for semester project">
+          </div>
+        </div>
+
+        <div class="modal-footer border-top pt-2">
+          <button type="button" class="btn btn-academic-outline btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-academic-gold btn-sm" id="btn-confirm-workflow" onclick="executeIssueWorkflow()" disabled>
+            Step 4: Confirm Issue
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Return Book Modal with Overdue Simulation & Fine Confirmation -->
+  <div class="modal fade" id="returnBookModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content card-academic p-3">
+        <div class="modal-header border-bottom pb-2">
+          <h5 class="modal-title font-serif fw-bold"><i class="bi bi-arrow-return-left text-success me-2"></i>Process Book Return</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form onsubmit="submitReturnBook(event)">
+          <div class="modal-body py-3">
+            <input type="hidden" id="return-tx-id">
+            <div class="mb-2">
+              <label class="small text-muted fw-semibold">Volume Title</label>
+              <input type="text" id="return-book-title" class="form-control form-control-sm" readonly>
+            </div>
+            <div class="mb-2">
+              <label class="small text-muted fw-semibold">Member</label>
+              <input type="text" id="return-member-name" class="form-control form-control-sm" readonly>
+            </div>
+            <div class="mb-3">
+              <label class="small text-muted fw-semibold">Return Date (Leave empty for Today, or pick date to test fine formula)</label>
+              <input type="date" id="return-date" class="form-control form-control-sm">
+              <small class="text-muted">Formula: <code>max(0, returnDate - dueDate) × fineRate</code></small>
+            </div>
+            <div class="mb-3">
+              <label class="small text-muted fw-semibold">Volume Condition Notes</label>
+              <input type="text" id="return-notes" class="form-control form-control-sm" placeholder="Returned in good condition">
+            </div>
+          </div>
+          <div class="modal-footer border-top pt-2">
+            <button type="button" class="btn btn-academic-outline btn-sm" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-academic-primary btn-sm">Confirm Return</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer class="academic-footer">
+    <div class="container text-center text-white-50">
+      <small>© 2025 University Digital Library Management System. Academic Enterprise Edition.</small>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/dashboard.js"></script>
+  <script src="/js/transactions.js"></script>
+  <script>
+    let selectedMember = null;
+    let selectedBook = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = checkAuth(['LIBRARIAN', 'ADMIN']);
+      if (!user) return;
+      document.getElementById('nav-librarian-name').innerText = user.name;
+      document.getElementById('sidebar-lib-name').innerText = user.name;
+      loadLibrarianDashboard();
+    });
+
+    function openStepIssueModal() {
+      selectedMember = null;
+      selectedBook = null;
+      document.getElementById('workflow-member-query').value = '';
+      document.getElementById('workflow-book-query').value = '';
+      document.getElementById('workflow-member-result').innerHTML = 'Awaiting member lookup...';
+      document.getElementById('workflow-book-result').innerHTML = 'Awaiting volume lookup...';
+      document.getElementById('btn-confirm-workflow').disabled = true;
+
+      const today = new Date();
+      document.getElementById('workflow-issue-date').innerText = today.toLocaleDateString();
+      document.getElementById('workflow-due-date').innerText = 'Determined upon member verification';
+
+      new bootstrap.Modal(document.getElementById('stepIssueModal')).show();
+    }
+
+    async function verifyWorkflowMember() {
+      const q = document.getElementById('workflow-member-query').value.trim();
+      const resContainer = document.getElementById('workflow-member-result');
+      if (!q) return;
+
+      try {
+        const res = await API.get(`/api/users?search=${encodeURIComponent(q)}&limit=1`);
+        const users = res.data?.data || [];
+        if (users.length === 0) {
+          resContainer.innerHTML = `<span class="text-danger">No member found with "${q}".</span>`;
+          selectedMember = null;
+        } else {
+          selectedMember = users[0];
+          // Check loans
+          const loansRes = await API.get(`/api/users/${selectedMember._id}/history?limit=50`);
+          const loans = loansRes.data?.data || [];
+          const activeLoans = loans.filter(l => l.status === 'ISSUED' || l.status === 'OVERDUE');
+
+          const days = selectedMember.memberType === 'FACULTY' ? 30 : 14;
+          const dueDate = new Date();
+          dueDate.setDate(dueDate.getDate() + days);
+          document.getElementById('workflow-due-date').innerText = `${dueDate.toLocaleDateString()} (${days} days duration)`;
+
+          resContainer.innerHTML = `
+            <div class="alert alert-success py-2 px-3 mb-0 small">
+              <strong>${selectedMember.name}</strong> (${selectedMember.memberType}) &bull; ID: <code>${selectedMember.memberId || 'N/A'}</code>
+              <br>Active Loans: ${activeLoans.length} (Allowance: ${selectedMember.memberType === 'FACULTY' ? 5 : 3})
+            </div>
+          `;
+        }
+        checkWorkflowReady();
+      } catch (err) {
+        resContainer.innerHTML = `<span class="text-danger">${err.message}</span>`;
+      }
+    }
+
+    async function verifyWorkflowBook() {
+      const q = document.getElementById('workflow-book-query').value.trim();
+      const resContainer = document.getElementById('workflow-book-result');
+      if (!q) return;
+
+      try {
+        const res = await API.get(`/api/books/search?title=${encodeURIComponent(q)}&limit=1`);
+        const books = res.data?.data || [];
+        if (books.length === 0) {
+          resContainer.innerHTML = `<span class="text-danger">No volume found matching "${q}".</span>`;
+          selectedBook = null;
+        } else {
+          selectedBook = books[0];
+          const isAvail = selectedBook.availableCopies > 0;
+          resContainer.innerHTML = `
+            <div class="alert ${isAvail ? 'alert-success' : 'alert-danger'} py-2 px-3 mb-0 small">
+              <strong>${selectedBook.title}</strong> by ${selectedBook.author} &bull; ISBN: <code>${selectedBook.isbn}</code>
+              <br>Shelf Stock: <strong>${selectedBook.availableCopies}</strong> / ${selectedBook.totalCopies} copies available
+            </div>
+          `;
+        }
+        checkWorkflowReady();
+      } catch (err) {
+        resContainer.innerHTML = `<span class="text-danger">${err.message}</span>`;
+      }
+    }
+
+    function checkWorkflowReady() {
+      const btn = document.getElementById('btn-confirm-workflow');
+      if (selectedMember && selectedBook && selectedBook.availableCopies > 0) {
+        btn.disabled = false;
+      } else {
+        btn.disabled = true;
+      }
+    }
+
+    async function executeIssueWorkflow() {
+      if (!selectedMember || !selectedBook) return;
+
+      const notes = document.getElementById('workflow-notes').value.trim();
+      try {
+        const res = await API.post('/api/transactions/issue', {
+          bookId: selectedBook._id,
+          memberId: selectedMember._id,
+          notes
+        });
+
+        alert(`Book issued successfully!\nTransaction ID: ${res.data.transactionId}\nDue Date: ${new Date(res.data.dueDate).toLocaleDateString()}`);
+        bootstrap.Modal.getInstance(document.getElementById('stepIssueModal')).hide();
+        loadLibrarianDashboard();
+      } catch (err) {
+        alert(`Issue failed: ${err.message}`);
+      }
+    }
+  </script>
+</body>
+</html>

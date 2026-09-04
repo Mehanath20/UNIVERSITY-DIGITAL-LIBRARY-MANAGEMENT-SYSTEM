@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Library Management System | Prestigious Academic Library</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- 1. Premium Academic Navbar -->
+  <nav class="academic-navbar">
+    <div class="container d-flex justify-content-between align-items-center">
+      <a class="navbar-brand" href="/index.html">
+        <div class="brand-crest">
+          <i class="bi bi-mortarboard-fill"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">DIGITAL LIBRARY</span>
+          <span class="brand-sub">UNIVERSITY ACADEMIC REPOSITORY</span>
+        </div>
+      </a>
+
+      <div class="d-none d-lg-flex align-items-center gap-1">
+        <a class="nav-link active" href="/index.html">Home</a>
+        <a class="nav-link" href="/pages/books.html">Catalog</a>
+        <a class="nav-link" href="#categories-section">Categories</a>
+        <a class="nav-link" href="#how-it-works">How It Works</a>
+        <a class="nav-link" href="#benefits-section">Benefits</a>
+      </div>
+
+      <div class="d-flex align-items-center gap-2" id="nav-auth-buttons">
+        <a href="/pages/login.html" class="btn btn-academic-outline">Login</a>
+        <a href="/pages/register.html" class="btn btn-academic-gold">Register</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 2. Hero Section -->
+  <section class="hero-academic">
+    <div class="container">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+          <div class="hero-tagline">
+            <span class="gold-accent-line"></span>
+            <span>ACADEMIC SCHOLARSHIP & RESEARCH</span>
+          </div>
+          <h1 class="hero-heading">
+            YOUR KNOWLEDGE<br>STARTS HERE
+          </h1>
+          <p class="hero-subtitle">
+            Explore thousands of academic resources, discover new ideas, and access your university library anytime. Empowering scholarly research through digital cataloging and automated circulation.
+          </p>
+          <div class="d-flex flex-wrap gap-3">
+            <a href="/pages/books.html" class="btn btn-academic-primary">
+              <i class="bi bi-book-half me-2"></i>EXPLORE LIBRARY
+            </a>
+            <a href="/pages/login.html" class="btn btn-academic-outline">
+              <i class="bi bi-person-lock me-2"></i>MEMBER LOGIN
+            </a>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="hero-image-wrapper">
+            <img src="/assets/images/hero_library.jpg" alt="University Library Grand Reading Hall" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Central Academic Search Bar -->
+  <section class="search-section">
+    <div class="container">
+      <div class="search-box-academic">
+        <form onsubmit="handleMainSearch(event)">
+          <div class="search-input-group">
+            <i class="bi bi-search fs-5 text-muted ms-2 me-2"></i>
+            <input type="text" id="main-search-input" placeholder="Search books, authors, ISBN or categories...">
+            <button type="submit" class="btn btn-academic-gold">Search Catalog</button>
+          </div>
+        </form>
+
+        <div class="popular-categories">
+          <span class="small text-muted me-2"><i class="bi bi-fire me-1 text-warning"></i>Popular:</span>
+          <span class="category-pill" onclick="quickCategory('Computer Science')">Computer Science</span>
+          <span class="category-pill" onclick="quickCategory('Artificial Intelligence')">Artificial Intelligence</span>
+          <span class="category-pill" onclick="quickCategory('Database')">Database Systems</span>
+          <span class="category-pill" onclick="quickCategory('Networking')">Networking</span>
+          <span class="category-pill" onclick="quickCategory('Operating Systems')">Operating Systems</span>
+          <span class="category-pill" onclick="quickCategory('Data Science')">Data Science</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Library Statistics -->
+  <section class="py-5 my-3">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-6 col-md-3">
+          <div class="stat-card-academic">
+            <div class="stat-icon-wrapper"><i class="bi bi-journal-richtext"></i></div>
+            <div class="stat-number" id="hero-stat-books">16+</div>
+            <div class="stat-title">Catalog Titles</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-card-academic">
+            <div class="stat-icon-wrapper"><i class="bi bi-people"></i></div>
+            <div class="stat-number" id="hero-stat-members">10+</div>
+            <div class="stat-title">Scholars & Faculty</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-card-academic">
+            <div class="stat-icon-wrapper"><i class="bi bi-arrow-repeat"></i></div>
+            <div class="stat-number" id="hero-stat-loans">100%</div>
+            <div class="stat-title">Digital Circulation</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-card-academic">
+            <div class="stat-icon-wrapper"><i class="bi bi-building-check"></i></div>
+            <div class="stat-number">8</div>
+            <div class="stat-title">Curriculum Domains</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Featured Books -->
+  <section class="py-5" style="background-color: var(--bg-primary); border-top: 1px solid var(--border-beige); border-bottom: 1px solid var(--border-beige);">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+          <div class="hero-tagline mb-1"><span class="gold-accent-line"></span><span>CURATED SELECTION</span></div>
+          <h2 class="mb-0">Featured Academic Books</h2>
+        </div>
+        <a href="/pages/books.html" class="btn btn-academic-outline btn-sm">View Full Catalog &rarr;</a>
+      </div>
+
+      <div class="row g-4" id="featured-books-row">
+        <!-- Dynamically rendered from /api/books -->
+        <div class="col-12 text-center py-5">
+          <div class="spinner-border text-warning" role="status"></div>
+          <p class="text-muted small mt-2">Loading curated volumes from library catalog...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Browse Categories -->
+  <section class="py-5" id="categories-section">
+    <div class="container">
+      <div class="text-center mb-5">
+        <div class="hero-tagline justify-content-center mb-1"><span class="gold-accent-line"></span><span>DISCIPLINES</span></div>
+        <h2>Browse by Subject Area</h2>
+        <p class="text-muted">Specialized collections matching university undergraduate and research curricula</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="card-academic p-4 text-center h-100 cursor-pointer" onclick="quickCategory('Computer Science')">
+            <div class="stat-icon-wrapper mx-auto mb-3"><i class="bi bi-cpu"></i></div>
+            <h5 class="fw-bold mb-1">Computer Science</h5>
+            <small class="text-muted">Automata, Algorithms, Theory</small>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="card-academic p-4 text-center h-100 cursor-pointer" onclick="quickCategory('Artificial Intelligence')">
+            <div class="stat-icon-wrapper mx-auto mb-3"><i class="bi bi-robot"></i></div>
+            <h5 class="fw-bold mb-1">Artificial Intelligence</h5>
+            <small class="text-muted">Deep Learning, Agents, Vision</small>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="card-academic p-4 text-center h-100 cursor-pointer" onclick="quickCategory('Data Science')">
+            <div class="stat-icon-wrapper mx-auto mb-3"><i class="bi bi-graph-up-arrow"></i></div>
+            <h5 class="fw-bold mb-1">Data Science</h5>
+            <small class="text-muted">Analytics, Inference, Mining</small>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="card-academic p-4 text-center h-100 cursor-pointer" onclick="quickCategory('Database')">
+            <div class="stat-icon-wrapper mx-auto mb-3"><i class="bi bi-database-fill-gear"></i></div>
+            <h5 class="fw-bold mb-1">Database Systems</h5>
+            <small class="text-muted">Distributed Storage, SQL, NoSQL</small>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="card-academic p-4 text-center h-100 cursor-pointer" onclick="quickCategory('Networking')">
+            <div class="stat-icon-wrapper mx-auto mb-3"><i class="bi bi-diagram-3"></i></div>
+            <h5 class="fw-bold mb-1">Networking</h5>
+            <small class="text-muted">Protocols, TCP/IP, Cloud</small>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="card-academic p-4 text-center h-100 cursor-pointer" onclick="quickCategory('Operating Systems')">
+            <div class="stat-icon-wrapper mx-auto mb-3"><i class="bi bi-terminal"></i></div>
+            <h5 class="fw-bold mb-1">Operating Systems</h5>
+            <small class="text-muted">Kernels, Concurrency, Memory</small>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="card-academic p-4 text-center h-100 cursor-pointer" onclick="quickCategory('Programming')">
+            <div class="stat-icon-wrapper mx-auto mb-3"><i class="bi bi-code-slash"></i></div>
+            <h5 class="fw-bold mb-1">Software Craft</h5>
+            <small class="text-muted">Design Patterns, Clean Code</small>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="card-academic p-4 text-center h-100 cursor-pointer" onclick="quickCategory('Mathematics')">
+            <div class="stat-icon-wrapper mx-auto mb-3"><i class="bi bi-calculator"></i></div>
+            <h5 class="fw-bold mb-1">Mathematics</h5>
+            <small class="text-muted">Discrete Math, Linear Algebra</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. How-It-Works Section -->
+  <section class="py-5" id="how-it-works" style="background-color: var(--bg-primary); border-top: 1px solid var(--border-beige); border-bottom: 1px solid var(--border-beige);">
+    <div class="container">
+      <div class="text-center mb-5">
+        <div class="hero-tagline justify-content-center mb-1"><span class="gold-accent-line"></span><span>WORKFLOW</span></div>
+        <h2>How the Digital Library Operates</h2>
+        <p class="text-muted">Four simple steps from catalog discovery to automated return and fine tracking</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-3">
+          <div class="card-academic p-4 h-100 border-top border-4" style="border-top-color: var(--gold) !important;">
+            <div class="fs-1 fw-bold text-muted opacity-50 mb-2 font-serif">01</div>
+            <h5 class="fw-bold mb-2">Search & Discover</h5>
+            <p class="text-muted small mb-0">Search thousands of academic volumes by title, author, or ISBN. Check real-time shelf availability instantly.</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card-academic p-4 h-100 border-top border-4" style="border-top-color: var(--bg-navy) !important;">
+            <div class="fs-1 fw-bold text-muted opacity-50 mb-2 font-serif">02</div>
+            <h5 class="fw-bold mb-2">Borrow or Hold</h5>
+            <p class="text-muted small mb-0">Borrow available copies within your membership allowance, or place an automated FIFO reservation hold.</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card-academic p-4 h-100 border-top border-4" style="border-top-color: var(--gold) !important;">
+            <div class="fs-1 fw-bold text-muted opacity-50 mb-2 font-serif">03</div>
+            <h5 class="fw-bold mb-2">Research & Study</h5>
+            <p class="text-muted small mb-0">Enjoy standard loan periods (14 days for students, 30 days for faculty) with timely automated due-date notifications.</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card-academic p-4 h-100 border-top border-4" style="border-top-color: var(--bg-navy) !important;">
+            <div class="fs-1 fw-bold text-muted opacity-50 mb-2 font-serif">04</div>
+            <h5 class="fw-bold mb-2">Return & Settle</h5>
+            <p class="text-muted small mb-0">Circulation desk processes returns seamlessly. Accrued overdue fines are transparently tallied with 1-click settlement.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Library Benefits -->
+  <section class="py-5" id="benefits-section">
+    <div class="container">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+          <div class="hero-tagline mb-1"><span class="gold-accent-line"></span><span>INSTITUTIONAL EXCELLENCE</span></div>
+          <h2 class="mb-3">Engineered for Academic Rigor</h2>
+          <p class="text-muted mb-4">
+            Designed from the ground up to replace outdated manual paper registers with an auditable, modern digital platform tailored for university faculties and students.
+          </p>
+
+          <div class="d-flex align-items-start gap-3 mb-3">
+            <div class="stat-icon-wrapper flex-shrink-0"><i class="bi bi-shield-check text-success"></i></div>
+            <div>
+              <h6 class="fw-bold mb-1">Strict Role-Based Security</h6>
+              <p class="text-muted small mb-0">Fine-grained permissions guaranteeing separate authorized consoles for Students, Faculty, Librarians, and Administrators.</p>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start gap-3 mb-3">
+            <div class="stat-icon-wrapper flex-shrink-0"><i class="bi bi-hourglass-split text-primary"></i></div>
+            <div>
+              <h6 class="fw-bold mb-1">Automated Reservation FIFO Queue</h6>
+              <p class="text-muted small mb-0">High-demand books trigger priority hold notifications the instant a copy is checked back into circulation.</p>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start gap-3">
+            <div class="stat-icon-wrapper flex-shrink-0"><i class="bi bi-bar-chart-line text-warning"></i></div>
+            <div>
+              <h6 class="fw-bold mb-1">Comprehensive Institutional Reports</h6>
+              <p class="text-muted small mb-0">Executive dashboards tracking copy depreciation, lost copies, most-borrowed curriculum titles, and fine balances.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="p-4 p-md-5 card-academic gold-border-top text-center" style="background-color: var(--bg-primary);">
+            <i class="bi bi-mortarboard display-3 text-warning mb-3"></i>
+            <h3 class="fw-bold mb-2">Ready to Start Learning?</h3>
+            <p class="text-muted mb-4">Register in seconds with your university credentials and unlock access to the university catalog.</p>
+            <div class="d-flex justify-content-center gap-2">
+              <a href="/pages/register.html" class="btn btn-academic-gold">Create Member Account</a>
+              <a href="/pages/login.html" class="btn btn-academic-outline">Member Sign In</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. Academic Footer -->
+  <footer class="academic-footer">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="brand-crest"><i class="bi bi-mortarboard-fill"></i></div>
+            <div class="brand-title text-white font-serif fs-5">DIGITAL LIBRARY</div>
+          </div>
+          <p class="small text-white-50 mb-3">
+            University Digital Library Management System. Providing seamless access to authoritative research literature, digital borrowings, and academic records.
+          </p>
+          <div class="small text-white-50">
+            <div><i class="bi bi-geo-alt me-2 text-warning"></i>Central University Campus, Building IV</div>
+            <div><i class="bi bi-clock me-2 text-warning"></i>Circulation Desk: Mon – Sat (8:00 AM – 9:00 PM)</div>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-2">
+          <h6>Navigation</h6>
+          <ul class="list-unstyled small d-flex flex-direction-column flex-column gap-2 mb-0">
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/pages/books.html">Catalog Search</a></li>
+            <li><a href="/pages/login.html">Sign In</a></li>
+            <li><a href="/pages/register.html">Student Register</a></li>
+          </ul>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <h6>Academic Subjects</h6>
+          <ul class="list-unstyled small d-flex flex-direction-column flex-column gap-2 mb-0">
+            <li><a href="/pages/books.html?category=Computer+Science">Computer Science</a></li>
+            <li><a href="/pages/books.html?category=Artificial+Intelligence">Artificial Intelligence</a></li>
+            <li><a href="/pages/books.html?category=Database">Database Systems</a></li>
+            <li><a href="/pages/books.html?category=Operating+Systems">Operating Systems</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-3">
+          <h6>Academic Policy</h6>
+          <p class="small text-white-50 mb-2">
+            Borrowing limits are governed by university senate membership plans. Undergraduates may borrow up to 3 books; faculty up to 5 books.
+          </p>
+          <span class="badge bg-secondary-subtle text-warning border border-warning" style="font-size: 0.72rem;">
+            SYSTEM STATUS: OPERATIONAL
+          </span>
+        </div>
+      </div>
+
+      <div class="footer-bottom text-center text-white-50">
+        <p class="mb-0">© 2025 University Digital Library Management System. All academic repository rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Check auth state for navbar buttons
+      const user = API.getUser();
+      if (user) {
+        const btnContainer = document.getElementById('nav-auth-buttons');
+        btnContainer.innerHTML = `
+          <a href="${getDashboardUrl(user.role)}" class="btn btn-academic-gold btn-sm"><i class="bi bi-speedometer2 me-1"></i>My Dashboard</a>
+          <button onclick="logout()" class="btn btn-academic-outline btn-sm">Logout</button>
+        `;
+      }
+
+      // Load 4 featured books dynamically from backend API
+      try {
+        const res = await API.get('/api/books?limit=4');
+        const books = res.data?.data || [];
+        const container = document.getElementById('featured-books-row');
+
+        if (books.length > 0) {
+          container.innerHTML = books.map(b => {
+            const isAvail = b.availableCopies > 0;
+            const badgeClass = isAvail ? 'available' : 'unavailable';
+            const badgeText = isAvail ? `${b.availableCopies} Available` : 'Reserved / Out of Stock';
+
+            return `
+              <div class="col-md-6 col-lg-3">
+                <div class="book-card-academic">
+                  <div class="book-cover-art">
+                    <div class="book-cover-category">${b.category}</div>
+                    <div class="book-cover-title">${b.title}</div>
+                    <div class="book-cover-author">${b.author}</div>
+                  </div>
+                  <div class="book-card-body">
+                    <div class="book-meta-row">
+                      <span class="badge-status ${badgeClass}">
+                        <i class="bi ${isAvail ? 'bi-check-circle-fill' : 'bi-x-circle-fill'}"></i>${badgeText}
+                      </span>
+                      <small class="text-muted">ISBN: ${b.isbn.substring(0, 10)}...</small>
+                    </div>
+                    <p class="small text-muted mb-3 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                      ${b.description || 'Academic course text.'}
+                    </p>
+                    <a href="/pages/book-details.html?id=${b._id}" class="btn btn-academic-outline btn-sm w-100">
+                      View Details
+                    </a>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        console.warn('Failed to load featured books:', err.message);
+      }
+    });
+
+    function getDashboardUrl(role) {
+      if (role === 'ADMIN') return '/pages/admin-dashboard.html';
+      if (role === 'LIBRARIAN') return '/pages/librarian-dashboard.html';
+      return '/pages/member-dashboard.html';
+    }
+
+    function handleMainSearch(e) {
+      e.preventDefault();
+      const val = document.getElementById('main-search-input').value.trim();
+      window.location.href = `/pages/books.html?search=${encodeURIComponent(val)}`;
+    }
+
+    function quickCategory(cat) {
+      window.location.href = `/pages/books.html?category=${encodeURIComponent(cat)}`;
+    }
+  </script>
+</body>
+</html>

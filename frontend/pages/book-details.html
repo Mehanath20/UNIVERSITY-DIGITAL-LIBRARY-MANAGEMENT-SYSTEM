@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volume Details | University Digital Library</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <div id="navbar-container"></div>
+
+  <div class="container py-4">
+    <a href="/pages/books.html" class="btn btn-academic-outline btn-sm mb-4">
+      <i class="bi bi-arrow-left me-1"></i>Back to Catalog
+    </a>
+
+    <!-- Main Book Header Card -->
+    <div class="card-academic p-4 p-md-5 mb-5 gold-border-top">
+      <div class="row g-5">
+        <!-- Left Book Cover Aesthetic -->
+        <div class="col-md-4">
+          <div class="book-cover-art rounded p-4 h-100 shadow-sm d-flex flex-column justify-content-between" style="min-height: 380px;">
+            <div>
+              <span class="badge bg-warning text-dark px-2 py-1 small fw-bold" id="detail-category-badge">Category</span>
+              <div class="gold-divider my-3"></div>
+              <h3 class="font-serif text-white fw-bold" id="detail-cover-title">Title</h3>
+            </div>
+            <div>
+              <p class="text-warning fst-italic mb-1" id="detail-cover-author">Author</p>
+              <small class="text-white-50">University Press Official Library Edition</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Detailed Specifications -->
+        <div class="col-md-8 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <span class="text-uppercase small fw-bold text-muted" id="detail-category">Discipline</span>
+            <span class="badge-status available fs-6 px-3 py-1" id="detail-avail-badge">Checking stock...</span>
+          </div>
+
+          <h1 class="font-serif fw-bold mb-2" id="detail-title">Volume Title</h1>
+          <p class="text-muted fs-6 mb-3"><i class="bi bi-person me-1"></i>Authored by <strong class="text-dark" id="detail-author">Author Name</strong></p>
+
+          <p class="text-secondary lead fs-6 mb-4" id="detail-description" style="line-height: 1.7;">
+            Academic literature description and curriculum syllabus topics covered.
+          </p>
+
+          <div class="row g-3 py-3 border-top border-bottom mb-4 bg-light rounded px-2">
+            <div class="col-sm-6">
+              <div class="small text-muted mb-1">Standard ISBN: <code class="fw-bold text-dark" id="detail-isbn">---</code></div>
+              <div class="small text-muted mb-1">Publisher: <span class="fw-semibold text-dark" id="detail-publisher">---</span></div>
+              <div class="small text-muted">Publication Year: <span class="fw-semibold text-dark" id="detail-year">---</span></div>
+            </div>
+            <div class="col-sm-6">
+              <div class="small text-muted mb-1">Total Catalog Copies: <span class="fw-bold text-dark" id="detail-total">0</span></div>
+              <div class="small text-muted mb-1">Available in Circulation: <span class="fw-bold text-success" id="detail-available">0</span></div>
+              <div class="small text-muted">Archival Status: <span class="badge bg-secondary-subtle text-dark" id="detail-status">ACTIVE</span></div>
+            </div>
+          </div>
+
+          <div class="mt-auto d-flex flex-wrap gap-3" id="detail-action-buttons"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Academic Books -->
+    <div class="mb-5">
+      <div class="hero-tagline mb-1"><span class="gold-accent-line"></span><span>RECOMMENDED SCHOLARSHIP</span></div>
+      <h3 class="font-serif fw-bold mb-3">Related Curriculum Volumes</h3>
+      <div class="row g-4" id="related-books-row"></div>
+    </div>
+
+    <!-- Staff Hold Queue Management View -->
+    <div class="card-academic d-none" id="staff-holds-panel">
+      <div class="card-academic-header">
+        <h5 class="fw-bold font-serif"><i class="bi bi-bookmark-star text-warning me-2"></i>Active Reservation Queue</h5>
+        <span class="badge bg-light text-dark border">Staff Circulation View</span>
+      </div>
+      <div class="table-responsive">
+        <table class="academic-table">
+          <thead>
+            <tr>
+              <th>Queue Position</th>
+              <th>Scholar Name</th>
+              <th>Membership ID</th>
+              <th>Date Requested</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="holds-tbody">
+            <tr><td colspan="5" class="text-center py-3 text-muted">Loading reservations...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer class="academic-footer">
+    <div class="container text-center text-white-50">
+      <small>© 2025 University Digital Library Management System. Academic Enterprise Edition.</small>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/books.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      renderNavbar('books');
+      const params = new URLSearchParams(window.location.search);
+      const bookId = params.get('id');
+      if (!bookId) {
+        window.location.href = '/pages/books.html';
+        return;
+      }
+
+      const user = API.getUser();
+
+      try {
+        const res = await API.get(`/api/books/${bookId}`);
+        const b = res.data;
+
+        document.getElementById('detail-title').innerText = b.title;
+        document.getElementById('detail-cover-title').innerText = b.title;
+        document.getElementById('detail-author').innerText = b.author;
+        document.getElementById('detail-cover-author').innerText = b.author;
+        document.getElementById('detail-category').innerText = b.category;
+        document.getElementById('detail-category-badge').innerText = b.category;
+        document.getElementById('detail-description').innerText = b.description || 'Comprehensive university text covering fundamental principles and modern research methodologies.';
+        document.getElementById('detail-isbn').innerText = b.isbn;
+        document.getElementById('detail-publisher').innerText = b.publisher || 'University Academic Press';
+        document.getElementById('detail-year').innerText = b.publicationYear || '2024';
+        document.getElementById('detail-total').innerText = b.totalCopies;
+        document.getElementById('detail-available').innerText = b.availableCopies;
+        document.getElementById('detail-status').innerText = b.status;
+
+        const isAvail = b.availableCopies > 0;
+        const badge = document.getElementById('detail-avail-badge');
+        if (isAvail) {
+          badge.className = 'badge-status available fs-6 px-3 py-1';
+          badge.innerHTML = `<i class="bi bi-check-circle-fill me-1"></i>${b.availableCopies} Copies In Stock`;
+        } else {
+          badge.className = 'badge-status unavailable fs-6 px-3 py-1';
+          badge.innerHTML = `<i class="bi bi-dash-circle me-1"></i>Out of Stock / Reserved`;
+        }
+
+        // Action buttons
+        const actionContainer = document.getElementById('detail-action-buttons');
+        if (user && user.role === 'MEMBER') {
+          if (isAvail) {
+            actionContainer.innerHTML = `
+              <button class="btn btn-academic-gold px-4 py-2" onclick="alert('This volume is available in the library stacks. Visit the central desk with your Member ID (${user.memberId}) to check it out.')">
+                <i class="bi bi-check2-circle me-1"></i>Available for Direct Desk Loan
+              </button>
+            `;
+          } else {
+            actionContainer.innerHTML = `
+              <button class="btn btn-academic-gold px-4 py-2" onclick="placeHold('${b._id}', '${escapeQuotes(b.title)}')">
+                <i class="bi bi-bookmark-plus me-1"></i>Place Reservation Hold
+              </button>
+            `;
+          }
+        } else if (user && (user.role === 'LIBRARIAN' || user.role === 'ADMIN')) {
+          actionContainer.innerHTML = `
+            <a href="/pages/inventory.html" class="btn btn-academic-primary px-4 py-2"><i class="bi bi-box-seam me-1"></i>Manage Inventory</a>
+            <a href="/pages/librarian-dashboard.html" class="btn btn-academic-outline px-4 py-2"><i class="bi bi-arrow-right-circle me-1"></i>Issue at Circulation Desk</a>
+          `;
+
+          // Show hold queue
+          document.getElementById('staff-holds-panel').classList.remove('d-none');
+          const holdRes = await API.get(`/api/holds/book/${b._id}`);
+          const holds = holdRes.data || [];
+          const holdsTbody = document.getElementById('holds-tbody');
+          if (holds.length === 0) {
+            holdsTbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">No reservations in queue for this volume.</td></tr>`;
+          } else {
+            holdsTbody.innerHTML = holds.map(h => `
+              <tr>
+                <td><span class="badge bg-light text-dark border">#${h.queuePosition}</span></td>
+                <td class="fw-semibold">${h.memberId?.name || 'Unknown'}</td>
+                <td><code>${h.memberId?.memberId || 'N/A'}</code></td>
+                <td>${new Date(h.requestedAt).toLocaleDateString()}</td>
+                <td><span class="badge-status ${h.status === 'NOTIFIED' ? 'issued' : 'available'}">${h.status}</span></td>
+              </tr>
+            `).join('');
+          }
+        } else {
+          actionContainer.innerHTML = `
+            <a href="/pages/login.html" class="btn btn-academic-gold px-4 py-2"><i class="bi bi-box-arrow-in-right me-1"></i>Sign in to Borrow or Hold</a>
+          `;
+        }
+
+        // Load related books
+        const relatedRes = await API.get(`/api/books/search?category=${encodeURIComponent(b.category)}&limit=4`);
+        const relatedBooks = (relatedRes.data?.data || []).filter(item => item._id !== b._id).slice(0, 3);
+        const relatedContainer = document.getElementById('related-books-row');
+
+        if (relatedBooks.length === 0) {
+          relatedContainer.innerHTML = `<div class="col-12 text-muted small">No other volumes currently in this category.</div>`;
+        } else {
+          relatedContainer.innerHTML = relatedBooks.map(rel => `
+            <div class="col-md-4">
+              <div class="book-card-academic">
+                <div class="book-cover-art" style="height: 140px;">
+                  <div class="book-cover-category">${rel.category}</div>
+                  <div class="book-cover-title fs-6">${rel.title}</div>
+                  <div class="book-cover-author small">${rel.author}</div>
+                </div>
+                <div class="book-card-body p-3">
+                  <a href="/pages/book-details.html?id=${rel._id}" class="btn btn-academic-outline btn-sm w-100">View Volume</a>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        }
+
+      } catch (err) {
+        alert(`Failed to load volume details: ${err.message}`);
+      }
+    });
+  </script>
+</body>
+</html>

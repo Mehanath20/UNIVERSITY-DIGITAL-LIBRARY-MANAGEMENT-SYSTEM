@@ -1,0 +1,575 @@
+{
+  "info": {
+    "_postman_id": "8f31e9c2-55d8-4b71-b0e6-81cf432a9001",
+    "name": "Digital Library Management System (DLMS) API",
+    "description": "Comprehensive academic production REST API collection for University Digital Library Management System covering all 13 modules, RBAC, borrowing workflows, hold queues, fines, inventory auditing, and administrative analytics.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000", "type": "string" },
+    { "key": "memberToken", "value": "", "type": "string" },
+    { "key": "librarianToken", "value": "", "type": "string" },
+    { "key": "adminToken", "value": "", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "bookId", "value": "", "type": "string" },
+    { "key": "transactionId", "value": "", "type": "string" },
+    { "key": "memberId", "value": "", "type": "string" },
+    { "key": "holdId", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "01 Authentication",
+      "item": [
+        {
+          "name": "Register Member",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Student Demo User\",\n  \"email\": \"demo.student@library.edu\",\n  \"password\": \"Password123!\",\n  \"memberType\": \"STUDENT\",\n  \"phone\": \"+1 (555) 999-0001\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] }
+          }
+        },
+        {
+          "name": "Login - Student Member",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.token) {",
+                  "  pm.collectionVariables.set('memberToken', json.data.token);",
+                  "  pm.collectionVariables.set('token', json.data.token);",
+                  "  if (json.data.user && json.data.user._id) {",
+                  "    pm.collectionVariables.set('memberId', json.data.user._id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alice.student@library.edu\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Login - Librarian",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.token) {",
+                  "  pm.collectionVariables.set('librarianToken', json.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"librarian@library.edu\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Login - Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.token) {",
+                  "  pm.collectionVariables.set('adminToken', json.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@library.edu\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Get Current User Profile (Me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/me", "host": ["{{baseUrl}}"], "path": ["api", "auth", "me"] }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/logout", "host": ["{{baseUrl}}"], "path": ["api", "auth", "logout"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Books",
+      "item": [
+        {
+          "name": "Get All Books (Paginated)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.data && json.data.data.length > 0) {",
+                  "  pm.collectionVariables.set('bookId', json.data.data[0]._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/books?page=1&limit=10", "host": ["{{baseUrl}}"], "path": ["api", "books"], "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Get Book by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/books/{{bookId}}", "host": ["{{baseUrl}}"], "path": ["api", "books", "{{bookId}}"] }
+          }
+        },
+        {
+          "name": "Create Book (Librarian/Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{librarianToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Cloud Computing Architecture\",\n  \"author\": \"Thomas Erl\",\n  \"isbn\": \"978-0133387520\",\n  \"category\": \"Networking\",\n  \"description\": \"Comprehensive service-oriented technology and cloud governance.\",\n  \"publisher\": \"Prentice Hall\",\n  \"publicationYear\": 2023,\n  \"totalCopies\": 5\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/books", "host": ["{{baseUrl}}"], "path": ["api", "books"] }
+          }
+        },
+        {
+          "name": "Update Book (Librarian/Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{librarianToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated curriculum course text edition.\",\n  \"publisher\": \"University Press\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/books/{{bookId}}", "host": ["{{baseUrl}}"], "path": ["api", "books", "{{bookId}}"] }
+          }
+        },
+        {
+          "name": "Delete or Archive Book (Librarian/Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{librarianToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/books/{{bookId}}", "host": ["{{baseUrl}}"], "path": ["api", "books", "{{bookId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Search",
+      "item": [
+        {
+          "name": "Search by Title",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/books/search?title=database&page=1&limit=10", "host": ["{{baseUrl}}"], "path": ["api", "books", "search"], "query": [{ "key": "title", "value": "database" }, { "key": "page", "value": "1" }, { "key": "limit", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Search by Category & Available Only",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/books/search?category=Artificial Intelligence&available=true", "host": ["{{baseUrl}}"], "path": ["api", "books", "search"], "query": [{ "key": "category", "value": "Artificial Intelligence" }, { "key": "available", "value": "true" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Transactions",
+      "item": [
+        {
+          "name": "Issue Book (Librarian)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.transactionId) {",
+                  "  pm.collectionVariables.set('transactionId', json.data.transactionId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{librarianToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookId\": \"{{bookId}}\",\n  \"memberId\": \"{{memberId}}\",\n  \"notes\": \"Regular semester issue\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/transactions/issue", "host": ["{{baseUrl}}"], "path": ["api", "transactions", "issue"] }
+          }
+        },
+        {
+          "name": "Return Book & Calculate Fine (Librarian)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{librarianToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Returned in good condition\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/transactions/{{transactionId}}/return", "host": ["{{baseUrl}}"], "path": ["api", "transactions", "{{transactionId}}", "return"] }
+          }
+        },
+        {
+          "name": "Get All Transactions (Librarian/Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{librarianToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/transactions?page=1&limit=10", "host": ["{{baseUrl}}"], "path": ["api", "transactions"], "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "10" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Holds",
+      "item": [
+        {
+          "name": "Place Reservation Hold (Member)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data._id) {",
+                  "  pm.collectionVariables.set('holdId', json.data._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{memberToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookId\": \"{{bookId}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/holds", "host": ["{{baseUrl}}"], "path": ["api", "holds"] }
+          }
+        },
+        {
+          "name": "Get My Active Holds (Member)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{memberToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/holds/my", "host": ["{{baseUrl}}"], "path": ["api", "holds", "my"] }
+          }
+        },
+        {
+          "name": "Get Book Hold Queue (Librarian)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{librarianToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/holds/book/{{bookId}}", "host": ["{{baseUrl}}"], "path": ["api", "holds", "book", "{{bookId}}"] }
+          }
+        },
+        {
+          "name": "Cancel Hold Reservation",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{memberToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/holds/{{holdId}}", "host": ["{{baseUrl}}"], "path": ["api", "holds", "{{holdId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Membership Plans",
+      "item": [
+        {
+          "name": "Get Membership Plans",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/membership-plans", "host": ["{{baseUrl}}"], "path": ["api", "membership-plans"] }
+          }
+        },
+        {
+          "name": "Create Membership Plan (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postgraduate Research Scholar Plan\",\n  \"memberType\": \"FACULTY\",\n  \"maxBooksAllowed\": 7,\n  \"loanDurationDays\": 45,\n  \"finePerDay\": 1,\n  \"maxFine\": 300,\n  \"isActive\": true\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/membership-plans", "host": ["{{baseUrl}}"], "path": ["api", "membership-plans"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 Fines",
+      "item": [
+        {
+          "name": "Get My Fines (Member)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{memberToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/fines/my", "host": ["{{baseUrl}}"], "path": ["api", "fines", "my"] }
+          }
+        },
+        {
+          "name": "Pay Fine (Member/Staff)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{memberToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 20.00,\n  \"paymentMethod\": \"MOCK\",\n  \"notes\": \"Paid via mock gateway\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/fines/{{transactionId}}/pay", "host": ["{{baseUrl}}"], "path": ["api", "fines", "{{transactionId}}", "pay"] }
+          }
+        },
+        {
+          "name": "Waive Fine (Librarian/Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{librarianToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Approved academic medical waiver\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/fines/{{transactionId}}/waive", "host": ["{{baseUrl}}"], "path": ["api", "fines", "{{transactionId}}", "waive"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 Notifications",
+      "item": [
+        {
+          "name": "Get My Notifications",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{memberToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/notifications/my", "host": ["{{baseUrl}}"], "path": ["api", "notifications", "my"] }
+          }
+        },
+        {
+          "name": "Run Overdue Scanner (Staff)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{librarianToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/notifications/scan", "host": ["{{baseUrl}}"], "path": ["api", "notifications", "scan"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 Inventory",
+      "item": [
+        {
+          "name": "Get Inventory Health & Ledgers",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{librarianToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/inventory?page=1&limit=10", "host": ["{{baseUrl}}"], "path": ["api", "inventory"], "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Adjust Book Copies",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{librarianToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 2,\n  \"reason\": \"Received grant copies for research lab\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/inventory/{{bookId}}/adjust", "host": ["{{baseUrl}}"], "path": ["api", "inventory", "{{bookId}}", "adjust"] }
+          }
+        },
+        {
+          "name": "Get Book Inventory Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{librarianToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/inventory/{{bookId}}/logs", "host": ["{{baseUrl}}"], "path": ["api", "inventory", "{{bookId}}", "logs"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 Borrowing History",
+      "item": [
+        {
+          "name": "Get My History (Member)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{memberToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/members/me/history?page=1&limit=10", "host": ["{{baseUrl}}"], "path": ["api", "members", "me", "history"], "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Get Member History by ID (Staff)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{librarianToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/members/{{memberId}}/history", "host": ["{{baseUrl}}"], "path": ["api", "members", "{{memberId}}", "history"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 Reports",
+      "item": [
+        {
+          "name": "Overview Report",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{librarianToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/admin/reports/overview", "host": ["{{baseUrl}}"], "path": ["api", "admin", "reports", "overview"] }
+          }
+        },
+        {
+          "name": "Most Borrowed Books",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{librarianToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/admin/reports/most-borrowed?limit=5", "host": ["{{baseUrl}}"], "path": ["api", "admin", "reports", "most-borrowed"], "query": [{ "key": "limit", "value": "5" }] }
+          }
+        },
+        {
+          "name": "Overdue Report",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{librarianToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/admin/reports/overdue", "host": ["{{baseUrl}}"], "path": ["api", "admin", "reports", "overdue"] }
+          }
+        },
+        {
+          "name": "Inventory Health Report",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{librarianToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/admin/reports/inventory", "host": ["{{baseUrl}}"], "path": ["api", "admin", "reports", "inventory"] }
+          }
+        },
+        {
+          "name": "Fines Collection Report",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{librarianToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/admin/reports/fines", "host": ["{{baseUrl}}"], "path": ["api", "admin", "reports", "fines"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 Admin",
+      "item": [
+        {
+          "name": "Get All Librarians",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/admin/librarians", "host": ["{{baseUrl}}"], "path": ["api", "admin", "librarians"] }
+          }
+        },
+        {
+          "name": "Create Librarian Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sarah Jenkins\",\n  \"email\": \"sarah.jenkins@library.edu\",\n  \"password\": \"Password123!\",\n  \"phone\": \"+1 (555) 777-1001\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/admin/librarians", "host": ["{{baseUrl}}"], "path": ["api", "admin", "librarians"] }
+          }
+        },
+        {
+          "name": "Get Admin System Stats",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/admin/stats", "host": ["{{baseUrl}}"], "path": ["api", "admin", "stats"] }
+          }
+        }
+      ]
+    }
+  ]
+}
