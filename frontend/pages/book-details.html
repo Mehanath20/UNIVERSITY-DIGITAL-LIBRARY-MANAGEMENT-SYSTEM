@@ -110,6 +110,14 @@
   <script src="/js/auth.js"></script>
   <script src="/js/books.js"></script>
   <script>
+    // Escape titles before placing them in inline button handlers.
+    function escapeQuotes(value = '') {
+      return String(value)
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/\r?\n/g, ' ');
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       renderNavbar('books');
       const params = new URLSearchParams(window.location.search);
@@ -154,8 +162,8 @@
         if (user && user.role === 'MEMBER') {
           if (isAvail) {
             actionContainer.innerHTML = `
-              <button class="btn btn-academic-gold px-4 py-2" onclick="alert('This volume is available in the library stacks. Visit the central desk with your Member ID (${user.memberId}) to check it out.')">
-                <i class="bi bi-check2-circle me-1"></i>Available for Direct Desk Loan
+              <button class="btn btn-academic-gold px-4 py-2" onclick="borrowBook('${b._id}', '${escapeQuotes(b.title)}')">
+                <i class="bi bi-check2-circle me-1"></i>Borrow This Book
               </button>
             `;
           } else {
@@ -223,6 +231,18 @@
         alert(`Failed to load volume details: ${err.message}`);
       }
     });
+  </script>
+  <script>
+    async function borrowBook(bookId, title) {
+      if (!confirm(`Borrow "${title}" now?`)) return;
+      try {
+        const result = await API.post('/api/transactions/borrow', { bookId });
+        alert(`Book borrowed successfully!\nDue date: ${new Date(result.data.dueDate).toLocaleDateString()}`);
+        window.location.href = '/pages/member-dashboard.html';
+      } catch (err) {
+        alert(`Could not borrow book: ${err.message}`);
+      }
+    }
   </script>
 </body>
 </html>

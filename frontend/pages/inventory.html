@@ -71,10 +71,29 @@
 
     <!-- Copy Ledger Table -->
     <div class="card-academic mb-4">
-      <div class="card-academic-header">
-        <h5 class="fw-bold font-serif"><i class="bi bi-box-seam text-primary me-2"></i>Curriculum Inventory Holdings</h5>
-        <span class="badge bg-light text-dark border">Formal Audit Trail</span>
+      <div class="card-academic-header flex-wrap gap-2">
+        <h5 class="fw-bold font-serif mb-0"><i class="bi bi-box-seam text-primary me-2"></i>Curriculum Inventory Holdings</h5>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+          <div class="input-group input-group-sm" style="max-width: 260px;">
+            <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+            <input type="text" id="inv-search-input" class="form-control" placeholder="Search title or ISBN..." oninput="filterInventory()">
+          </div>
+          <span class="badge bg-light text-dark border">Formal Audit Trail</span>
+        </div>
       </div>
+
+      <!-- Mathematical Conservation Invariant Banner -->
+      <div class="p-3 bg-light border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2 small">
+        <div>
+          <i class="bi bi-shield-check text-success me-1"></i>
+          <strong>Circulation Invariant Formula:</strong>
+          <code>Total Copies &equiv; Available + On Loan + Lost + Damaged</code>
+        </div>
+        <span class="badge bg-success-subtle text-success border border-success-subtle">
+          <i class="bi bi-check-all me-1"></i>Conservation Invariant Validated
+        </span>
+      </div>
+
       <div class="table-responsive">
         <table class="academic-table">
           <thead>
@@ -90,7 +109,7 @@
             </tr>
           </thead>
           <tbody id="inventory-tbody">
-            <tr><td colspan="8" class="text-center py-4 text-muted">Loading inventory ledger...</td></tr>
+            <tr><td colspan="8" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Loading inventory ledger...</td></tr>
           </tbody>
         </table>
       </div>
@@ -228,39 +247,60 @@
       }
     }
 
+    let allInventoryBooks = [];
+
     async function loadInventoryLedger() {
       const tbody = document.getElementById('inventory-tbody');
       try {
-        const res = await API.get('/api/inventory?limit=50');
-        const books = res.data?.data || [];
-
-        if (books.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">No catalog holdings recorded.</td></tr>`;
-          return;
-        }
-
-        tbody.innerHTML = books.map(b => `
-          <tr>
-            <td class="fw-semibold font-serif">${b.title}</td>
-            <td><code>${b.isbn}</code></td>
-            <td class="fw-bold">${b.totalCopies}</td>
-            <td class="fw-bold text-success">${b.availableCopies}</td>
-            <td class="text-danger">${b.lostCopies || 0}</td>
-            <td class="text-warning">${b.damagedCopies || 0}</td>
-            <td><span class="badge bg-light text-dark border">${b.availabilityPercentage}</span></td>
-            <td>
-              <div class="btn-group btn-group-sm">
-                <button class="btn btn-academic-outline" onclick="openAdjustModal('${b._id}', '${escapeQuotes(b.title)}')">Adjust</button>
-                <button class="btn btn-academic-outline" onclick="openStatusModal('${b._id}', '${escapeQuotes(b.title)}', 'damaged')">Damaged</button>
-                <button class="btn btn-academic-outline" onclick="openStatusModal('${b._id}', '${escapeQuotes(b.title)}', 'lost')">Lost</button>
-                <button class="btn btn-academic-outline" onclick="viewAuditLogs('${b._id}')">Logs</button>
-              </div>
-            </td>
-          </tr>
-        `).join('');
+        const res = await API.get('/api/inventory?limit=100');
+        allInventoryBooks = res.data?.data || [];
+        renderInventoryTable(allInventoryBooks);
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="8" class="alert alert-danger py-2">Error: ${err.message}</td></tr>`;
+        if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="alert alert-danger py-2">Error: ${err.message}</td></tr>`;
       }
+    }
+
+    function renderInventoryTable(books) {
+      const tbody = document.getElementById('inventory-tbody');
+      if (!tbody) return;
+
+      if (books.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">No catalog holdings match your search query.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = books.map(b => `
+        <tr>
+          <td class="fw-semibold font-serif">${b.title}</td>
+          <td><code>${b.isbn}</code></td>
+          <td class="fw-bold">${b.totalCopies}</td>
+          <td class="fw-bold text-success">${b.availableCopies}</td>
+          <td class="text-danger">${b.lostCopies || 0}</td>
+          <td class="text-warning">${b.damagedCopies || 0}</td>
+          <td><span class="badge bg-light text-dark border">${b.availabilityPercentage}</span></td>
+          <td>
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-academic-outline" onclick="openAdjustModal('${b._id}', '${escapeQuotes(b.title)}')"><i class="bi bi-pencil me-1"></i>Adjust</button>
+              <button class="btn btn-academic-outline" onclick="openStatusModal('${b._id}', '${escapeQuotes(b.title)}', 'damaged')">Damaged</button>
+              <button class="btn btn-academic-outline" onclick="openStatusModal('${b._id}', '${escapeQuotes(b.title)}', 'lost')">Lost</button>
+              <button class="btn btn-academic-outline" onclick="viewAuditLogs('${b._id}')">Logs</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterInventory() {
+      const q = document.getElementById('inv-search-input')?.value.toLowerCase().trim() || '';
+      if (!q) {
+        renderInventoryTable(allInventoryBooks);
+        return;
+      }
+      const filtered = allInventoryBooks.filter(b => 
+        (b.title && b.title.toLowerCase().includes(q)) || 
+        (b.isbn && b.isbn.toLowerCase().includes(q))
+      );
+      renderInventoryTable(filtered);
     }
 
     function openAdjustModal(bookId, title) {

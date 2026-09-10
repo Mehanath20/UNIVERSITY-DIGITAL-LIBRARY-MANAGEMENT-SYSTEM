@@ -6,7 +6,8 @@ let mongoMemoryServer = null;
 export const connectDB = async () => {
   try {
     // Attempt standard connection to MONGODB_URI
-    console.log(`[Database] Attempting connection to MongoDB: ${ENV.MONGODB_URI}...`);
+    const safeUri = ENV.MONGODB_URI.replace(/:\/\/([^:@]+):([^@]+)@/, '://$1:********@');
+    console.log(`[Database] Attempting connection to MongoDB: ${safeUri}...`);
     await mongoose.connect(ENV.MONGODB_URI, {
       serverSelectionTimeoutMS: 2500
     });
@@ -14,6 +15,12 @@ export const connectDB = async () => {
     return mongoose.connection;
   } catch (primaryError) {
     console.warn(`[Database] Could not connect to primary MongoDB instance (${primaryError.message}).`);
+
+    // Never hide a real deployment configuration problem behind temporary storage.
+    if (ENV.NODE_ENV === 'production' || ENV.USE_MEMORY_DB === false) {
+      throw primaryError;
+    }
+
     console.log('[Database] Initiating embedded MongoDB Memory Server for automatic zero-config operation...');
 
     try {

@@ -41,6 +41,7 @@ function renderNavbar(activePage = '') {
   if (!navContainer) return;
 
   let linksHtml = '';
+  let sidebarLinksHtml = '';
 
   if (user) {
     if (user.role === 'MEMBER') {
@@ -51,6 +52,14 @@ function renderNavbar(activePage = '') {
         <li class="nav-item"><a class="nav-link ${activePage === 'reservations' ? 'active' : ''}" href="/pages/reservations.html"><i class="bi bi-bookmark-check me-1"></i>Reservations</a></li>
         <li class="nav-item"><a class="nav-link ${activePage === 'fines' ? 'active' : ''}" href="/pages/fines.html"><i class="bi bi-cash-coin me-1"></i>Fines</a></li>
       `;
+      sidebarLinksHtml = `
+        <a class="sidebar-nav-link ${activePage === 'dashboard' ? 'active' : ''}" href="/pages/member-dashboard.html"><i class="bi bi-speedometer2"></i>Dashboard</a>
+        <a class="sidebar-nav-link ${activePage === 'books' ? 'active' : ''}" href="/pages/books.html"><i class="bi bi-book"></i>Browse Books</a>
+        <a class="sidebar-nav-link ${activePage === 'history' ? 'active' : ''}" href="/pages/borrowing-history.html"><i class="bi bi-clock-history"></i>My Loans</a>
+        <a class="sidebar-nav-link ${activePage === 'reservations' ? 'active' : ''}" href="/pages/reservations.html"><i class="bi bi-bookmark-check"></i>Reservations</a>
+        <a class="sidebar-nav-link ${activePage === 'fines' ? 'active' : ''}" href="/pages/fines.html"><i class="bi bi-cash-coin"></i>Fines & Fees</a>
+        <a class="sidebar-nav-link" href="/pages/login.html" onclick="event.preventDefault(); logout()"><i class="bi bi-box-arrow-left"></i>Logout</a>
+      `;
     } else if (user.role === 'LIBRARIAN') {
       linksHtml = `
         <li class="nav-item"><a class="nav-link ${activePage === 'dashboard' ? 'active' : ''}" href="/pages/librarian-dashboard.html"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></li>
@@ -60,12 +69,31 @@ function renderNavbar(activePage = '') {
         <li class="nav-item"><a class="nav-link ${activePage === 'fines' ? 'active' : ''}" href="/pages/fines.html"><i class="bi bi-cash-coin me-1"></i>Fines</a></li>
         <li class="nav-item"><a class="nav-link ${activePage === 'reports' ? 'active' : ''}" href="/pages/reports.html"><i class="bi bi-bar-chart-line me-1"></i>Reports</a></li>
       `;
+      sidebarLinksHtml = `
+        <a class="sidebar-nav-link ${activePage === 'dashboard' ? 'active' : ''}" href="/pages/librarian-dashboard.html"><i class="bi bi-speedometer2"></i>Dashboard</a>
+        <a class="sidebar-nav-link ${activePage === 'books' ? 'active' : ''}" href="/pages/books.html"><i class="bi bi-book"></i>Catalog Books</a>
+        <a class="sidebar-nav-link ${activePage === 'history' ? 'active' : ''}" href="/pages/borrowing-history.html"><i class="bi bi-arrow-return-left"></i>Returns & Loans</a>
+        <a class="sidebar-nav-link ${activePage === 'inventory' ? 'active' : ''}" href="/pages/inventory.html"><i class="bi bi-box-seam"></i>Inventory Audit</a>
+        <a class="sidebar-nav-link ${activePage === 'reservations' ? 'active' : ''}" href="/pages/reservations.html"><i class="bi bi-bookmark-check"></i>Reservations</a>
+        <a class="sidebar-nav-link ${activePage === 'fines' ? 'active' : ''}" href="/pages/fines.html"><i class="bi bi-cash-coin"></i>Fine Collection</a>
+        <a class="sidebar-nav-link ${activePage === 'reports' ? 'active' : ''}" href="/pages/reports.html"><i class="bi bi-bar-chart-line"></i>Reports</a>
+        <a class="sidebar-nav-link" href="/pages/login.html" onclick="event.preventDefault(); logout()"><i class="bi bi-box-arrow-left"></i>Logout</a>
+      `;
     } else if (user.role === 'ADMIN') {
       linksHtml = `
         <li class="nav-item"><a class="nav-link ${activePage === 'dashboard' ? 'active' : ''}" href="/pages/admin-dashboard.html"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></li>
         <li class="nav-item"><a class="nav-link ${activePage === 'books' ? 'active' : ''}" href="/pages/books.html"><i class="bi bi-book me-1"></i>Books</a></li>
         <li class="nav-item"><a class="nav-link ${activePage === 'inventory' ? 'active' : ''}" href="/pages/inventory.html"><i class="bi bi-box-seam me-1"></i>Inventory</a></li>
         <li class="nav-item"><a class="nav-link ${activePage === 'reports' ? 'active' : ''}" href="/pages/reports.html"><i class="bi bi-bar-chart-line me-1"></i>Reports</a></li>
+      `;
+      sidebarLinksHtml = `
+        <a class="sidebar-nav-link ${activePage === 'dashboard' ? 'active' : ''}" href="/pages/admin-dashboard.html"><i class="bi bi-speedometer2"></i>Dashboard</a>
+        <a class="sidebar-nav-link ${activePage === 'books' ? 'active' : ''}" href="/pages/books.html"><i class="bi bi-book"></i>Catalog Books</a>
+        <a class="sidebar-nav-link ${activePage === 'inventory' ? 'active' : ''}" href="/pages/inventory.html"><i class="bi bi-box-seam"></i>Inventory Audit</a>
+        <a class="sidebar-nav-link ${activePage === 'history' ? 'active' : ''}" href="/pages/borrowing-history.html"><i class="bi bi-clock-history"></i>Transactions</a>
+        <a class="sidebar-nav-link ${activePage === 'fines' ? 'active' : ''}" href="/pages/fines.html"><i class="bi bi-cash-coin"></i>Fine Ledger</a>
+        <a class="sidebar-nav-link ${activePage === 'reports' ? 'active' : ''}" href="/pages/reports.html"><i class="bi bi-bar-chart-line"></i>Reports & Analytics</a>
+        <a class="sidebar-nav-link" href="/pages/login.html" onclick="event.preventDefault(); logout()"><i class="bi bi-box-arrow-left"></i>Logout</a>
       `;
     }
   } else {
@@ -93,23 +121,24 @@ function renderNavbar(activePage = '') {
   `;
 
   navContainer.innerHTML = `
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--primary);">
+    <nav class="navbar navbar-expand-lg navbar-dark dynamic-topbar" style="background-color: var(--bg-navy);">
       <div class="container-fluid px-4">
         <a class="navbar-brand" href="/index.html">
-          <i class="bi bi-journal-bookmark-fill text-warning"></i>
-          <span>DIGITAL LIBRARY</span>
-          <span class="brand-badge">UNIVERSITY</span>
+          <div class="brand-crest"><i class="bi bi-mortarboard-fill"></i></div>
+          <div class="brand-text">
+            <span class="brand-title">DIGITAL LIBRARY</span>
+            <span class="brand-sub">${user?.role === 'ADMIN' ? 'ADMINISTRATION PORTAL' : user?.role === 'LIBRARIAN' ? 'LIBRARIAN PORTAL' : 'MEMBER PORTAL'}</span>
+          </div>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#dlmsNav">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="dlmsNav">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            ${linksHtml}
-          </ul>
-          ${userControls}
-        </div>
+        ${userControls}
       </div>
     </nav>
+    <aside class="dynamic-sidebar">
+      <div class="sidebar-user-card">
+        <div class="sidebar-user-name">${user?.name || 'Library Guest'}</div>
+        <div class="sidebar-role-badge">${user?.memberType || user?.role || 'CATALOG'}</div>
+      </div>
+      <nav class="sidebar-nav">${sidebarLinksHtml}</nav>
+    </aside>
   `;
 }

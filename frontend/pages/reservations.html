@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hold Reservations Queue | DLMS</title>
+  <title>Hold Reservations Queue | University Digital Library</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
@@ -23,23 +23,79 @@
           </ol>
         </nav>
         <h2 class="font-serif fw-bold mb-0">Book Reservation & Hold Queue</h2>
-        <p class="text-muted small mb-0">FIFO priority queue. When a copy is returned to circulation, the earliest waiting scholar is automatically notified.</p>
+        <p class="text-muted small mb-0">Automated First-In-First-Out (FIFO) priority waitlist for high-demand curriculum volumes.</p>
       </div>
-      <div>
-        <a href="/pages/books.html" class="btn btn-academic-gold btn-sm"><i class="bi bi-search me-1"></i>Search Catalog</a>
+      <div class="d-flex gap-2 mt-3 mt-md-0">
+        <a href="/pages/books.html" class="btn btn-academic-gold btn-sm">
+          <i class="bi bi-search me-1"></i>Search Catalog
+        </a>
+      </div>
+    </div>
+
+    <!-- 4 Liquid Glass Metric Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-card-academic">
+          <div class="stat-icon-wrapper"><i class="bi bi-bookmark-star text-primary"></i></div>
+          <div class="stat-number" id="stat-total-holds">0</div>
+          <div class="stat-title">Total Holds</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card-academic">
+          <div class="stat-icon-wrapper"><i class="bi bi-hourglass-split text-warning"></i></div>
+          <div class="stat-number" id="stat-waiting-holds">0</div>
+          <div class="stat-title">Waiting in Queue</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card-academic">
+          <div class="stat-icon-wrapper"><i class="bi bi-bell text-info"></i></div>
+          <div class="stat-number" id="stat-notified-holds">0</div>
+          <div class="stat-title">Ready for Pickup</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card-academic">
+          <div class="stat-icon-wrapper"><i class="bi bi-check2-circle text-success"></i></div>
+          <div class="stat-number" id="stat-fulfilled-holds">0</div>
+          <div class="stat-title">Fulfilled Holds</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Policy Banner -->
+    <div class="card-academic p-3 mb-4" style="background: rgba(200, 169, 81, 0.08); border-color: rgba(200, 169, 81, 0.3);">
+      <div class="d-flex align-items-center gap-3">
+        <i class="bi bi-info-circle-fill text-warning fs-4 flex-shrink-0"></i>
+        <div class="small">
+          <strong>Institutional Allocation Policy:</strong> When a checked-out book is returned to the circulation desk, the earliest waiting scholar in the queue is automatically promoted to <code>NOTIFIED</code> with an exclusive <strong>3-day reservation hold</strong> before the next waiting scholar or the general catalog can claim it.
+        </div>
       </div>
     </div>
 
     <!-- Active Reservations Table -->
     <div class="card-academic mb-4">
       <div class="card-academic-header">
-        <h5 class="fw-bold font-serif"><i class="bi bi-bookmark-star text-warning me-2"></i>Active Reservation Holds</h5>
-        <span class="badge bg-light text-dark border">Priority Order</span>
+        <div class="d-flex align-items-center gap-2">
+          <h5 class="fw-bold font-serif mb-0"><i class="bi bi-list-stars text-warning me-2"></i>Hold Reservations Ledger</h5>
+          <span class="badge bg-light text-dark border" id="holds-view-label">Personal Queue</span>
+        </div>
+        <div>
+          <select id="filter-hold-status" class="form-select form-select-sm" style="width: auto;" onchange="loadReservationsPage()">
+            <option value="">All Hold Statuses</option>
+            <option value="WAITING">Waiting in Queue</option>
+            <option value="NOTIFIED">Ready for Pickup</option>
+            <option value="FULFILLED">Fulfilled</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+        </div>
       </div>
       <div class="table-responsive">
         <table class="academic-table">
           <thead>
             <tr>
+              <th id="th-hold-member" class="d-none">Scholar</th>
               <th>Volume Title</th>
               <th>ISBN</th>
               <th>Date Requested</th>
@@ -49,7 +105,7 @@
             </tr>
           </thead>
           <tbody id="holds-tbody">
-            <tr><td colspan="6" class="text-center py-4 text-muted">Loading your reservations...</td></tr>
+            <tr><td colspan="7" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-warning me-2"></div>Loading reservations...</td></tr>
           </tbody>
         </table>
       </div>

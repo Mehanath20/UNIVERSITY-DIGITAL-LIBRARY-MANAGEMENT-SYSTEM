@@ -8,6 +8,22 @@ async function loadFinesPage() {
   renderNavbar('fines');
 
   const isStaff = user.role === 'LIBRARIAN' || user.role === 'ADMIN';
+  const thMember = document.getElementById('th-fine-member');
+  const badgeLabel = document.getElementById('fine-badge-label');
+
+  if (thMember && isStaff) {
+    thMember.classList.remove('d-none');
+    if (badgeLabel) badgeLabel.innerText = 'Institutional Fine Collection Ledger';
+  } else if (thMember) {
+    thMember.classList.add('d-none');
+    if (badgeLabel) badgeLabel.innerText = 'Personal Outstanding Fines';
+  }
+
+  const colCount = isStaff ? 7 : 6;
+  const tbody = document.getElementById('fines-tbody');
+  if (tbody) {
+    tbody.innerHTML = `<tr><td colspan="${colCount}" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-warning me-2"></div>Loading fine records...</td></tr>`;
+  }
 
   try {
     let finesData;
@@ -29,17 +45,21 @@ async function loadFinesPage() {
       };
     }
 
-    document.getElementById('fine-total-amount').innerText = `$${(finesData.summary.totalFines || 0).toFixed(2)}`;
-    document.getElementById('fine-unpaid-amount').innerText = `$${(finesData.summary.unpaidFines || 0).toFixed(2)}`;
-    document.getElementById('fine-paid-amount').innerText = `$${(finesData.summary.paidFines || 0).toFixed(2)}`;
-    document.getElementById('fine-waived-amount').innerText = `$${(finesData.summary.waivedFines || 0).toFixed(2)}`;
+    const totalEl = document.getElementById('fine-total-amount');
+    const unpaidEl = document.getElementById('fine-unpaid-amount');
+    const paidEl = document.getElementById('fine-paid-amount');
+    const waivedEl = document.getElementById('fine-waived-amount');
 
-    const tbody = document.getElementById('fines-tbody');
+    if (totalEl) totalEl.innerText = `₹${(finesData.summary.totalFines || 0).toFixed(2)}`;
+    if (unpaidEl) unpaidEl.innerText = `₹${(finesData.summary.unpaidFines || 0).toFixed(2)}`;
+    if (paidEl) paidEl.innerText = `₹${(finesData.summary.paidFines || 0).toFixed(2)}`;
+    if (waivedEl) waivedEl.innerText = `₹${(finesData.summary.waivedFines || 0).toFixed(2)}`;
+
     if (!tbody) return;
 
     const list = finesData.transactions || [];
     if (list.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">No fine records found. Outstanding balance is zero.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="${colCount}" class="text-center py-4 text-muted">No fine records found. Outstanding balance is zero.</td></tr>`;
       return;
     }
 
@@ -51,24 +71,26 @@ async function loadFinesPage() {
       let actions = '';
       if (t.fineStatus === 'UNPAID' || t.fineStatus === 'PARTIAL') {
         actions = `
-          <button class="btn btn-sm btn-success" onclick="openPayFineModal('${t._id}', ${t.fine})"><i class="bi bi-credit-card me-1"></i>Pay</button>
+          <button class="btn btn-sm btn-academic-gold" onclick="openPayFineModal('${t._id}', ${t.fine})"><i class="bi bi-credit-card me-1"></i>Pay</button>
         `;
         if (isStaff) {
           actions += `
-            <button class="btn btn-sm btn-outline-danger ms-1" onclick="openWaiveFineModal('${t._id}', ${t.fine})">Waive</button>
+            <button class="btn btn-sm btn-academic-outline ms-1" onclick="openWaiveFineModal('${t._id}', ${t.fine})">Waive</button>
           `;
         }
       } else {
-        actions = `<span class="badge bg-light text-dark border">Resolved</span>`;
+        actions = `<span class="badge bg-light text-dark border"><i class="bi bi-check-circle-fill text-success me-1"></i>Resolved</span>`;
       }
+
+      const memberCol = isStaff ? `<td><div class="fw-semibold">${t.memberId?.name || 'N/A'}</div><small class="text-muted">${t.memberId?.memberId || ''}</small></td>` : '';
 
       return `
         <tr>
           <td><code>${t._id.substring(t._id.length - 6)}</code></td>
           <td class="fw-semibold">${t.bookId?.title || 'Unknown Title'}</td>
-          ${isStaff ? `<td>${t.memberId?.name || 'N/A'}</td>` : ''}
-          <td>${t.returnDate ? new Date(t.returnDate).toLocaleDateString() : 'Active'}</td>
-          <td class="fw-bold text-danger">$${t.fine.toFixed(2)}</td>
+          ${memberCol}
+          <td>${t.returnDate ? new Date(t.returnDate).toLocaleDateString() : '<span class="badge bg-warning-subtle text-dark">Active Overdue</span>'}</td>
+          <td class="fw-bold text-danger">₹${t.fine.toFixed(2)}</td>
           <td><span class="badge ${statusBadge}">${t.fineStatus}</span></td>
           <td>${actions}</td>
         </tr>
@@ -76,7 +98,9 @@ async function loadFinesPage() {
     }).join('');
 
   } catch (err) {
-    console.error('Failed to load fines:', err);
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="${colCount}" class="alert alert-danger py-2">Error: ${err.message}</td></tr>`;
+    }
   }
 }
 
@@ -95,7 +119,7 @@ async function submitPayFine(e) {
 
   try {
     const res = await API.post(`/api/fines/${txId}/pay`, { amount, paymentMethod });
-    alert(`Payment successful! Reference: ${res.data.payment.referenceNumber}\nFine status is now PAID.`);
+    alert(`Payment successful!\nPayment Reference: ${res.data.payment.referenceNumber}\nAmount Settled: ₹${amount.toFixed(2)}\nStatus: PAID`);
     bootstrap.Modal.getInstance(document.getElementById('payFineModal')).hide();
     loadFinesPage();
   } catch (err) {
@@ -105,7 +129,7 @@ async function submitPayFine(e) {
 
 function openWaiveFineModal(txId, amount) {
   document.getElementById('waive-tx-id').value = txId;
-  document.getElementById('waive-amount').innerText = `$${amount.toFixed(2)}`;
+  document.getElementById('waive-amount').innerText = `₹${amount.toFixed(2)}`;
   document.getElementById('waive-reason').value = '';
   const modal = new bootstrap.Modal(document.getElementById('waiveFineModal'));
   modal.show();

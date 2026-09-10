@@ -10,6 +10,13 @@ export const issueBookSchema = Joi.object({
   notes: Joi.string().trim().allow('').default('')
 });
 
+export const borrowBookSchema = Joi.object({
+  bookId: Joi.string().hex().length(24).required().messages({
+    'string.length': 'bookId must be a valid 24-character ObjectId'
+  }),
+  notes: Joi.string().trim().allow('').default('')
+});
+
 export const returnBookSchema = Joi.object({
   returnDate: Joi.date().iso().optional(),
   notes: Joi.string().trim().allow('').default('')

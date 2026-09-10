@@ -71,6 +71,18 @@ export class HoldService {
       .sort({ queuePosition: 1, requestedAt: 1 });
   }
 
+  static async getAllHolds(query = {}) {
+    const filter = {};
+    if (query.status) filter.status = query.status;
+    if (query.bookId) filter.bookId = query.bookId;
+    if (query.memberId) filter.memberId = query.memberId;
+
+    return Hold.find(filter)
+      .populate('bookId', 'title author isbn availableCopies status')
+      .populate('memberId', 'name email memberId memberType')
+      .sort({ requestedAt: -1 });
+  }
+
   static async cancelHold(holdId, userId, userRole) {
     const hold = await Hold.findById(holdId);
     if (!hold) {

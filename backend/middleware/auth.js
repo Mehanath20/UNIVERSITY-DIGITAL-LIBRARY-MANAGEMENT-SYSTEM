@@ -34,3 +34,23 @@ export const authenticateJWT = async (req, res, next) => {
     return next(error);
   }
 };
+
+export const optionalAuth = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return next();
+    }
+
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, ENV.JWT_SECRET);
+
+    const user = await User.findById(decoded.userId).select('-passwordHash');
+    if (user && user.isActive) {
+      req.user = user;
+    }
+    next();
+  } catch {
+    next();
+  }
+};

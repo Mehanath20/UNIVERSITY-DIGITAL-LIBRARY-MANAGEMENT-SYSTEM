@@ -28,6 +28,15 @@ export const getBookHolds = async (req, res, next) => {
   }
 };
 
+export const getAllHolds = async (req, res, next) => {
+  try {
+    const holds = await HoldService.getAllHolds(req.query);
+    return sendSuccess(res, 'Institutional hold queue retrieved', holds);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const cancelHold = async (req, res, next) => {
   try {
     const result = await HoldService.cancelHold(req.params.id, req.user._id, req.user.role);

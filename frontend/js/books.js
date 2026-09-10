@@ -51,7 +51,7 @@ async function loadBooks(page = 1) {
       let actionBtn = '';
       if (user?.role === 'MEMBER') {
         if (isAvailable) {
-          actionBtn = `<span class="badge bg-success-subtle text-success py-2 px-3"><i class="bi bi-check-circle me-1"></i>Available at Desk</span>`;
+          actionBtn = `<button class="btn btn-sm btn-success w-100" onclick="borrowBook('${book._id}', '${escapeQuotes(book.title)}')"><i class="bi bi-check-circle me-1"></i>Borrow Book</button>`;
         } else {
           actionBtn = `<button class="btn btn-sm btn-outline-warning w-100" onclick="placeHold('${book._id}', '${escapeQuotes(book.title)}')"><i class="bi bi-bookmark-plus me-1"></i>Place Hold</button>`;
         }
@@ -97,6 +97,21 @@ async function loadBooks(page = 1) {
   } catch (err) {
     container.innerHTML = `<div class="col-12 alert alert-danger">Error loading books: ${err.message}</div>`;
   }
+}
+
+async function borrowBook(bookId, title) {
+  if (!confirm(`Borrow "${title}" now?`)) return;
+  try {
+    const result = await API.post('/api/transactions/borrow', { bookId });
+    alert(`Book borrowed successfully!\nDue date: ${new Date(result.data.dueDate).toLocaleDateString()}`);
+    window.location.href = '/pages/member-dashboard.html';
+  } catch (err) {
+    alert(`Could not borrow book: ${err.message}`);
+  }
+}
+
+function escapeQuotes(value = '') {
+  return String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r?\n/g, ' ');
 }
 
 function renderPagination(pagination) {

@@ -10,6 +10,19 @@ export const issueBook = async (req, res, next) => {
   }
 };
 
+// Allows a signed-in member to borrow a book for their own account.
+export const borrowBook = async (req, res, next) => {
+  try {
+    const result = await TransactionService.issueBook(
+      { ...req.body, memberId: req.user._id },
+      req.user
+    );
+    return sendSuccess(res, 'Book borrowed successfully', result, 201);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const returnBook = async (req, res, next) => {
   try {
     const result = await TransactionService.returnBook(req.params.id, req.body, req.user);

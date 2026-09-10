@@ -49,7 +49,7 @@
         <li><a href="/pages/reservations.html" class="sidebar-nav-link"><i class="bi bi-bookmark-check"></i>Reservations</a></li>
         <li><a href="/pages/fines.html" class="sidebar-nav-link"><i class="bi bi-cash-coin"></i>Fines & Fees</a></li>
         <li><a href="/pages/borrowing-history.html" class="sidebar-nav-link"><i class="bi bi-journal-text"></i>History</a></li>
-        <li><a href="#" class="sidebar-nav-link" onclick="logout()"><i class="bi bi-box-arrow-left"></i>Logout</a></li>
+          <li><a href="/pages/login.html" class="sidebar-nav-link" onclick="event.preventDefault(); logout()"><i class="bi bi-box-arrow-left"></i>Logout</a></li>
       </ul>
     </aside>
 
@@ -84,7 +84,7 @@
         <div class="col-sm-6 col-xl-3">
           <div class="stat-card-academic">
             <div class="stat-icon-wrapper"><i class="bi bi-exclamation-triangle text-danger"></i></div>
-            <div class="stat-number text-danger" id="stat-outstanding-fine">$0.00</div>
+            <div class="stat-number text-danger" id="stat-outstanding-fine">₹0.00</div>
             <div class="stat-title">Outstanding Fine</div>
           </div>
         </div>
@@ -97,10 +97,10 @@
         </div>
       </div>
 
-      <!-- Current Borrowings Table -->
+      <!-- Recent Borrowing Activity -->
       <div class="card-academic mb-4">
         <div class="card-academic-header">
-          <h5 class="fw-bold font-serif"><i class="bi bi-book-half text-primary me-2"></i>Current Borrowings</h5>
+          <h5 class="fw-bold font-serif"><i class="bi bi-book-half text-primary me-2"></i>Recent Borrowing Activity</h5>
           <a href="/pages/borrowing-history.html" class="btn btn-academic-outline btn-sm">Full History &rarr;</a>
         </div>
         <div class="table-responsive">
@@ -175,7 +175,7 @@
         // Fines
         const fineRes = await API.get('/api/fines/my');
         const unpaid = fineRes.data?.summary?.unpaidFines || 0;
-        document.getElementById('stat-outstanding-fine').innerText = `$${unpaid.toFixed(2)}`;
+        document.getElementById('stat-outstanding-fine').innerText = `₹${unpaid.toFixed(2)}`;
 
         // Active Holds
         const holdRes = await API.get('/api/holds/my');
@@ -183,22 +183,23 @@
         const activeHolds = holds.filter(h => h.status === 'WAITING' || h.status === 'NOTIFIED');
         document.getElementById('stat-reservations-count').innerText = activeHolds.length;
 
-        // Active loans table
+        // Recent loans table: keep returned books visible so members can confirm returns.
         const tbody = document.getElementById('active-loans-tbody');
-        if (active.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">No books currently on loan. <a href="/pages/books.html" class="text-dark fw-bold">Explore catalog to borrow</a></td></tr>`;
+        if (loans.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">No borrowing records yet. <a href="/pages/books.html" class="text-dark fw-bold">Explore catalog to borrow</a></td></tr>`;
         } else {
-          tbody.innerHTML = active.map(l => {
+          tbody.innerHTML = loans.map(l => {
             const isOverdue = new Date(l.dueDate) < now;
-            const badgeClass = isOverdue ? 'overdue' : 'issued';
-            const badgeText = isOverdue ? 'OVERDUE' : 'ON LOAN';
+            const isReturned = l.status === 'RETURNED';
+            const badgeClass = isReturned ? 'available' : (isOverdue ? 'overdue' : 'issued');
+            const badgeText = isReturned ? `RETURNED${l.returnDate ? ` (${new Date(l.returnDate).toLocaleDateString()})` : ''}` : (isOverdue ? 'OVERDUE' : 'ON LOAN');
 
             return `
               <tr>
                 <td class="fw-semibold">${l.bookId?.title || 'Unknown Title'}</td>
                 <td><code>${l.bookId?.isbn || '---'}</code></td>
                 <td>${new Date(l.issueDate).toLocaleDateString()}</td>
-                <td class="${isOverdue ? 'text-danger fw-bold' : ''}">${new Date(l.dueDate).toLocaleDateString()}</td>
+                <td class="${isOverdue && !isReturned ? 'text-danger fw-bold' : ''}">${new Date(l.dueDate).toLocaleDateString()}</td>
                 <td><span class="badge-status ${badgeClass}">${badgeText}</span></td>
               </tr>
             `;

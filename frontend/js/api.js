@@ -2,8 +2,9 @@
  * Centralized API client for DLMS Frontend
  */
 const API = {
-  baseUrl: window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
-    ? ''
+  // Allow the frontend to run from Live Server (3000) while the API runs on Express (5000).
+  baseUrl: ['3000', '5500', '5501'].includes(window.location.port)
+    ? 'http://localhost:5000'
     : '',
 
   getToken() {
